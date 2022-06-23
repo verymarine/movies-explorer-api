@@ -49,11 +49,11 @@ module.exports.login = async (req, res, next) => {
 module.exports.createUser = async (req, res, next) => {
   try {
     const {
-    email, password,
+    name, email, password,
     } = req.body;
     const hash = await bcrypt.hash(password, 10);
     const user = await User.create({
-     email, password: hash,
+     name, email, password: hash,
     });
     const savedUser = await user.save();
     const { password: removedPassword, ...result } = savedUser.toObject();

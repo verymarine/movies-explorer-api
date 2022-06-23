@@ -5,3 +5,7 @@
       "no-underscore-dangle": ["error", { "allow": ["_id"] }]
     }
   }
+
+  // в .eslintrc добавлено исключение для _id.
+  // Директивы eslint-disable, eslint-disable-line
+  // и eslint-disable-next-line запрещены.
