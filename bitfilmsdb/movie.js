@@ -12,14 +12,14 @@ const movieSchema = new mongoose.Schema({
   },
   movieId: {
     type: Number,
-    // type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }], // не факт что правильно проверить
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }], // не факт что правильно проверить
     required: true,
   },
-  // owner: {
-  //   type: mongoose.Schema.Types.ObjectId, // не факт что правильно
-  //   ref: 'user', // не факт что правильно
-  //   required: true,
-  // },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId, // не факт что правильно
+    ref: 'user', // не факт что правильно
+    required: true,
+  },
   thumbnail: {
     type: String,
     required: true,

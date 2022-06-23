@@ -38,7 +38,8 @@ module.exports.postFavoriteMovie = async (req, res, next) => {
       nameEN,
       thumbnail,
       movieId,
-      trailerLink
+      trailerLink,
+      owner,
     } = req.body;
 
     const movie = await Movie.create({
@@ -52,9 +53,10 @@ module.exports.postFavoriteMovie = async (req, res, next) => {
       nameEN,
       thumbnail,
       movieId,
-      trailerLink
+      trailerLink,
+      owner: req.user._id,
     });// HERE SHOULD BE SMTH
-    // movie = await movie.populate('owner');
+    movie = await movie.populate('owner');
     if (movie) {
       res.status(200).send(movie);
     }
