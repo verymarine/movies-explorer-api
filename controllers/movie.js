@@ -34,15 +34,27 @@ module.exports.postFavoriteMovie = async (req, res, next) => {
       year,
       description,
       image,
-      trailer,
       nameRU,
       nameEN,
       thumbnail,
-      movieId
+      movieId,
+      trailerLink
     } = req.body;
 
-    const movie = await Movie.create({});// HERE SHOULD BE SMTH
-    movie = await movie.populate('owner');
+    const movie = await Movie.create({
+      country,
+      director,
+      duration,
+      year,
+      description,
+      image,
+      nameRU,
+      nameEN,
+      thumbnail,
+      movieId,
+      trailerLink
+    });// HERE SHOULD BE SMTH
+    // movie = await movie.populate('owner');
     if (movie) {
       res.status(200).send(movie);
     }

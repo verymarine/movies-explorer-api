@@ -15,20 +15,18 @@ const NotFound = require('./errors/NotFound');
 
 
 const allowedCors = [
-  // 'https://verymarine.domain.nomoredomains.xyz',
-  // 'http://verymarine.domain.nomoredomains.xyz',
+  'https://moviehub.nomoredomains.xyz',
+  'http://moviehub.nomoredomains.xyz',
   'https://localhost:3001',
   'http://localhost:3001',
   'http://localhost:3000',
 ];
 
-
-
 // вызов нашего модуля
 const app = express();
+
 // переменная окружения
 const { PORT = 3000 } = process.env;
-
 
 app.use(cors({
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -36,15 +34,10 @@ app.use(cors({
   credentials: true,
 }));
 
-
-
 app.use(bodyParser.json()); // для собирания JSON-формата
 app.use(bodyParser.urlencoded({ extended: true })); // для приёма веб-страниц внутри POST-запроса
 
-
-
 app.use(cookieParser());
-
 
 // подключаемся к серверу mongo
 mongoose.connect('mongodb://localhost:27017/moviesdb', {
@@ -65,13 +58,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 // регистраци и логин
-
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required().trim(),
   }),
 }), login);
+
 app.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -82,17 +75,19 @@ app.post('/signup', celebrate({
 
 
 
-app.use(auth);
+// app.use(auth);
 
 
 // пользователь и кино
 
 app.use('/users', require('./routes/users'));
-//   app.use('/cards', require('./routes/cards'));
+app.use('/movies', require('./routes/movies'));
 
-app.use('*', auth, (req, res, next) => {
-  next(new NotFound('Страницы не существует'));
-});
+// app.use('/', require('./routes/index'));
+
+// app.use('*', auth, (req, res, next) => {
+//   next(new NotFound('Страницы не существует'));
+// });
 
 app.use(errorLogger);
 

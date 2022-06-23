@@ -49,11 +49,11 @@ module.exports.login = async (req, res, next) => {
 module.exports.createUser = async (req, res, next) => {
   try {
     const {
-    name, email, password,
+      name, email, password,
     } = req.body;
     const hash = await bcrypt.hash(password, 10);
     const user = await User.create({
-     name, email, password: hash,
+      name, email, password: hash,
     });
     const savedUser = await user.save();
     const { password: removedPassword, ...result } = savedUser.toObject();
@@ -74,20 +74,58 @@ module.exports.createUser = async (req, res, next) => {
   }
 };
 
+// // ВЫХОД
+// module.exports.logout = async (req, res, next) => {
+//   try {
+//     const { email, password } = req.body;
+//     const user = await User.findOne({ email }).select('+password');
+//     console.log(user);
+// //
+//     res.clearCookie('token', { httpOnly: true });
+//     res.status(200).json({ message: "OK" })
+//     //
+
+
+//     //
+//     router.post(
+//       "/logout",
+//       (req, res, next) => {
+//         res.clearCookie("jwt");
+//         next();
+//       },
+//       (req, res) => {
+//         console.log(req.cookies);
+//         res.end("finish");
+//       }
+//     );
+//     //
+
+//     //
+//     res.clearCookie('my_cookie', {domain: COOKIE_DOMAIN, path: COOKIE_PATH});
+//     //
+
+//   } catch (err) {
+//     next(new Unauthorized('Пользователь не найден'));
+//   }
+// };
+
 // # возвращает информацию о пользователе (email и имя)
 // GET /users/me
 
 module.exports.getUser = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findOne(req.user);
     if (user) {
       res.status(200).send(user);
     } else {
-      next(err);// передать класс ошибки
+      next(new NotFound('Пользователь по указанному _id не найден'));
     }
   } catch (err) {
-    next(err);
-// передать класс ошибки
+    if (err.name === 'CastError') {
+      next(new BadRequest('Некорректные данные'));
+    } else {
+      next(err);
+    }
   }
 };
 
@@ -96,28 +134,27 @@ module.exports.getUser = async (req, res, next) => {
 
 module.exports.patchUser = async (req, res, next) => {
   try {
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
+    const user = await User.findOneAndUpdate(
+      // req.user._id,
       {
         name: req.body.name,
         email: req.body.email,
       },
-      {
-        new: true,
-        runValidators: true,
-      },
+      // {
+      //   new: true,
+      //   runValidators: true,
+      // },
     );
     if (user) {
       res.status(200).send(user);
     } else {
-      next(err);// передать класс ошибки
+      next(new NotFound('Пользователь по указанному _id не найден'));
     }
   } catch (err) {
-    // уточнить поп оводу CastError
-    if (err.name === 'ValidationError' || err.name === 'CastError') {
-      next(err); // передать класс ошибки
+    if (err.name === 'ValidationError') {
+      next(new BadRequest('Переданы некорректные данные при изменении пользователя'));
     }
-    next(err);// передать класс ошибки
+    next(err);
   }
 };
 
