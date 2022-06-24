@@ -75,7 +75,7 @@ app.post('/signup', celebrate({
 
 
 
-// app.use(auth);
+app.use(auth);
 
 
 // пользователь и кино
@@ -85,9 +85,9 @@ app.use('/movies', require('./routes/movies'));
 
 // app.use('/', require('./routes/index'));
 
-// app.use('*', auth, (req, res, next) => {
-//   next(new NotFound('Страницы не существует'));
-// });
+app.use('*', auth, (req, res, next) => {
+  next(new NotFound('Страницы не существует'));
+});
 
 app.use(errorLogger);
 
