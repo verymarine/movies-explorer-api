@@ -10,22 +10,19 @@ const Conflict = require('../errors/Conflict');
 const MONGO_DUBLICATE_ERROR_CODE = 11000;
 const { NODE_ENV, JWT_SECRET } = process.env;
 
+// При использовании next в функции-контроллере
+// необходимо завершать её работу ключевым словом
+// return, чтобы функция не продолжала своё выполнение.
 
 // АВТОРИЗАЦИЯ
 module.exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email }).select('+password');
-    console.log(user);
-
-    if (!email || !password) {
-      next(new BadRequest('Неправильные почта или пароль'));
-      console.log(email, password);
-    }
     bcrypt.compare(password, user.password)
       .then((matched) => {
         if (!matched) {
-          next(new Unauthorized('Не удалось авторизоваться'));
+          return next(new Unauthorized('Не удалось авторизоваться'));
         }
 
         const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
@@ -34,18 +31,21 @@ module.exports.login = async (req, res, next) => {
           maxAge: 3600000,
           httpOnly: true,
           secure: true,
-          sameSite: 'None',
+          sameSite: false,
         });
 
-        res.status(200).send({ jwt: token });// тут добавила jwt // {token}
+        return res.send({ jwt: token });
+      })
+      .catch((err) => {
+        next(new BadRequest(err, 'Неправильные почта или пароль'));
       });
   } catch (err) {
-    next(new Unauthorized('Пользователь не найден'));
+    return next(new Unauthorized('Пользователь не найден'));
   }
+  return null;
 };
 
-
-// РЕГИСТРАЦИЯ
+// REGISTRATION
 module.exports.createUser = async (req, res, next) => {
   try {
     const {
@@ -57,14 +57,11 @@ module.exports.createUser = async (req, res, next) => {
     });
     const savedUser = await user.save();
     const { password: removedPassword, ...result } = savedUser.toObject();
-    if (!email || !password) {
-      next(new BadRequest('Неверный email или пароль'));
-    } else {
-      res.status(201).send(result);
-    }
+
+    res.send(result);
   } catch (err) {
     if (err.code === MONGO_DUBLICATE_ERROR_CODE) {
-      next(new Conflict('Пользователь уже существует'));
+      return next(new Conflict('Пользователь уже существует'));
     }
     if (err.name === 'ValidationError') {
       next(new BadRequest('Переданы некорректные данные при создании пользователя'));
@@ -72,6 +69,7 @@ module.exports.createUser = async (req, res, next) => {
       next(err);
     }
   }
+  return null;
 };
 
 // // ВЫХОД
@@ -84,7 +82,6 @@ module.exports.createUser = async (req, res, next) => {
 //     res.clearCookie('token', { httpOnly: true });
 //     res.status(200).json({ message: "OK" })
 //     //
-
 
 //     //
 //     router.post(
@@ -111,12 +108,11 @@ module.exports.createUser = async (req, res, next) => {
 
 // # возвращает информацию о пользователе (email и имя)
 // GET /users/me
-
 module.exports.getUser = async (req, res, next) => {
   try {
     const user = await User.findOne(req.user);
     if (user) {
-      res.status(200).send(user);
+      res.send(user);
     } else {
       next(new NotFound('Пользователь по указанному _id не найден'));
     }
@@ -131,7 +127,6 @@ module.exports.getUser = async (req, res, next) => {
 
 // # обновляет информацию о пользователе (email и имя)
 // PATCH /users/me
-
 module.exports.patchUser = async (req, res, next) => {
   try {
     const user = await User.findOneAndUpdate(
@@ -146,7 +141,7 @@ module.exports.patchUser = async (req, res, next) => {
       // },
     );
     if (user) {
-      res.status(200).send(user);
+      res.send(user);
     } else {
       next(new NotFound('Пользователь по указанному _id не найден'));
     }
@@ -157,4 +152,3 @@ module.exports.patchUser = async (req, res, next) => {
     next(err);
   }
 };
-

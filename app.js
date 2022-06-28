@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -45,6 +46,17 @@ mongoose.connect('mongodb://localhost:27017/moviesdb', {
   useUnifiedTopology: true,
 });
 
+// //Использование пакета dotenv для чтения переменных из файла .env в Node
+// require('dotenv').config();
+// var MongoClient = require('mongodb').MongoClient;
+
+// // Обращение к переменным из .env, которые теперь доступны в process.env
+// MongoClient.connect(process.env.DB_CONN, function(err, db) {
+//   if(!err) {
+//     console.log("We are connected");
+//   }
+// });
+
 app.use(requestLogger);
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -67,6 +79,7 @@ app.post('/signin', celebrate({
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
     email: Joi.string().required().email(),
     password: Joi.string().required().trim(),
   }),
@@ -74,8 +87,7 @@ app.post('/signup', celebrate({
 
 
 
-
-app.use(auth);
+// app.use(auth);
 
 
 // пользователь и кино
@@ -85,9 +97,9 @@ app.use('/movies', require('./routes/movies'));
 
 // app.use('/', require('./routes/index'));
 
-app.use('*', auth, (req, res, next) => {
-  next(new NotFound('Страницы не существует'));
-});
+// app.use('*', auth, (req, res, next) => {
+//   next(new NotFound('Страницы не существует'));
+// });
 
 app.use(errorLogger);
 
