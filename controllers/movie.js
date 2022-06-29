@@ -64,7 +64,7 @@ module.exports.postFavoriteMovie = async (req, res, next) => {
 module.exports.deleteFavoriteMovie = async (req, res, next) => {
   try {
     const movie = await Movie.findByIdAndDelete(req.params._id);
-    // .populate('owner'); // findbyone difference between
+    // .populate('owner'); // findbyone difference betwee
     if (movie.owner.toString() !== req.user._id) {
       return next(new Forbidden('Этот фильм удалить нельзя'));
     }
