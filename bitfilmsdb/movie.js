@@ -16,8 +16,8 @@ const movieSchema = new mongoose.Schema({
     required: true,
   },
   owner: {
-    type: mongoose.Schema.Types.ObjectId, // не факт что правильно
-    ref: 'user', // не факт что правильно
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
     required: true,
   },
   thumbnail: {

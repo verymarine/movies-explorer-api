@@ -3,17 +3,17 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
-const { celebrate, Joi, errors } = require('celebrate');
 const cors = require('cors');
 const path = require('path');
-
-const { login, createUser } = require('./controllers/user');
 const auth = require('./middlewares/auth');
+const error = require('./middlewares/error');
+const limiter = require('./middlewares/limiter');
 
-const { requestLogger, errorLogger } = require('./middlewares/logger');
 const NotFound = require('./errors/NotFound');
 
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
+const { NODE_ENV, DB_CONN } = process.env;
 
 const allowedCors = [
   'https://moviehub.nomoredomains.xyz',
@@ -41,21 +41,10 @@ app.use(bodyParser.urlencoded({ extended: true })); // для приёма ве�
 app.use(cookieParser());
 
 // подключаемся к серверу mongo
-mongoose.connect('mongodb://localhost:27017/moviesdb', {
+mongoose.connect(NODE_ENV === 'production' ? DB_CONN : '', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-
-// //Использование пакета dotenv для чтения переменных из файла .env в Node
-// require('dotenv').config();
-// var MongoClient = require('mongodb').MongoClient;
-
-// // Обращение к переменным из .env, которые теперь доступны в process.env
-// MongoClient.connect(process.env.DB_CONN, function(err, db) {
-//   if(!err) {
-//     console.log("We are connected");
-//   }
-// });
 
 app.use(requestLogger);
 
@@ -67,57 +56,30 @@ app.use(express.static(path.join(__dirname, 'public')));
 //     }, 0);
 //   });
 
-
+// Use to limit repeated requests to public API
+app.use(limiter);
 
 // регистраци и логин
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().trim(),
-  }),
-}), login);
-
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    email: Joi.string().required().email(),
-    password: Joi.string().required().trim(),
-  }),
-}), createUser);
+app.use(require('./routes/auth'));
 
 
-
-// app.use(auth);
-
+app.use(auth);
 
 // пользователь и кино
+app.use(require('./routes/users'));
+app.use(require('./routes/movies'));
 
-app.use('/users', require('./routes/users'));
-app.use('/movies', require('./routes/movies'));
+// app.use(require('./routes/index'));
 
-// app.use('/', require('./routes/index'));
-
-// app.use('*', auth, (req, res, next) => {
-//   next(new NotFound('Страницы не существует'));
-// });
+app.use('*', auth, (req, res, next) => {
+  next(new NotFound('Страницы не существует'));
+});
 
 app.use(errorLogger);
 
 app.use(errors());
 
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-
-  res
-    .status(statusCode)
-    .send({
-      // проверяем статус и выставляем сообщение в зависимости от него
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
-        : message,
-    });
-  next();
-});
+app.use(error);
 
 app.listen(PORT, () => {
   console.log(`server listen port ${PORT}`);

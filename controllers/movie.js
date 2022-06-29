@@ -50,9 +50,9 @@ module.exports.postFavoriteMovie = async (req, res, next) => {
       trailerLink,
       owner: req.user._id,
     });
-    if (movie) {
-      res.send(movie);
-    }
+    // if (movie) {
+    res.send(movie);
+    // }
   } catch (err) {
     next(err);
   }
@@ -62,10 +62,11 @@ module.exports.postFavoriteMovie = async (req, res, next) => {
 // DELETE /movies/_id
 module.exports.deleteFavoriteMovie = async (req, res, next) => {
   try {
-    const movie = await Movie.findByIdAndDelete(req.params._id).populate('owner');
+    const movie = await Movie.findByIdAndDelete(req.params._id);
+    // .populate('owner'); // findbyone difference between
 
     if (movie) {
-      res.send(movie);
+      res.send.remove(movie);
     } else {
       next(new NotFound('Фильм с таким _id не найден'));
     }
@@ -73,3 +74,20 @@ module.exports.deleteFavoriteMovie = async (req, res, next) => {
     next(err);
   }
 };
+
+// {
+
+//   "country": "TEST",
+//         "director": "TEST",
+//         "duration":"10",
+//         "year": "TEST",
+//         "description": "TEST",
+//         "image": "https://stickers.wiki/static/stickers/nekostickerpack407/file_674866.webp",
+//         "nameRU": "TEST",
+//         "nameEN": "TEST",
+//         "thumbnail": "https://stickers.wiki/static/stickers/nekostickerpack407/file_674866.webp",
+//         "movieId": "12",
+//        "trailerLink": "https://stickers.wiki/static/stickers/nekostickerpack407/file_674866.webp",
+//        "owner": "123456789012345678901234"
+//   }
+

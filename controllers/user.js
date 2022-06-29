@@ -14,33 +14,34 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 // необходимо завершать её работу ключевым словом
 // return, чтобы функция не продолжала своё выполнение.
 
-// АВТОРИЗАЦИЯ
+// АУНТИФИКАЦИЯ
 module.exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email }).select('+password');
     bcrypt.compare(password, user.password)
       .then((matched) => {
-        if (!matched) {
-          return next(new Unauthorized('Не удалось авторизоваться'));
+        // if (!matched) {
+        //   return next(new Unauthorized('Не удалось авторизоваться'));
+        // }
+        if (matched) {
+          const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
+
+          res.cookie('token', token, {
+            maxAge: 3600000,
+            httpOnly: true,
+            secure: true,
+            sameSite: false,
+          });
+
+          return res.send({ jwt: token });
         }
-
-        const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
-
-        res.cookie('token', token, {
-          maxAge: 3600000,
-          httpOnly: true,
-          secure: true,
-          sameSite: false,
-        });
-
-        return res.send({ jwt: token });
       })
       .catch((err) => {
-        next(new BadRequest(err, 'Неправильные почта или пароль'));
+        next(new Unauthorized(err, 'Неправильная почта или пароль'));
       });
   } catch (err) {
-    return next(new Unauthorized('Пользователь не найден'));
+    return next(new NotFound('Неправильная почта или пароль'));
   }
   return null;
 };
@@ -58,7 +59,7 @@ module.exports.createUser = async (req, res, next) => {
     const savedUser = await user.save();
     const { password: removedPassword, ...result } = savedUser.toObject();
 
-    res.send(result);
+    res.status(201).BadRequestsend(result);
   } catch (err) {
     if (err.code === MONGO_DUBLICATE_ERROR_CODE) {
       return next(new Conflict('Пользователь уже существует'));
@@ -72,39 +73,22 @@ module.exports.createUser = async (req, res, next) => {
   return null;
 };
 
-// // ВЫХОД
-// module.exports.logout = async (req, res, next) => {
-//   try {
-//     const { email, password } = req.body;
-//     const user = await User.findOne({ email }).select('+password');
-//     console.log(user);
-// //
-//     res.clearCookie('token', { httpOnly: true });
-//     res.status(200).json({ message: "OK" })
-//     //
-
-//     //
-//     router.post(
-//       "/logout",
-//       (req, res, next) => {
-//         res.clearCookie("jwt");
-//         next();
-//       },
-//       (req, res) => {
-//         console.log(req.cookies);
-//         res.end("finish");
-//       }
-//     );
-//     //
-
-//     //
-//     res.clearCookie('my_cookie', {domain: COOKIE_DOMAIN, path: COOKIE_PATH});
-//     //
-
-//   } catch (err) {
-//     next(new Unauthorized('Пользователь не найден'));
-//   }
-// };
+// ВЫХОД
+module.exports.logout = async (req, res) => {
+  res.clearCookie('token');
+  res.status(200).json({ message: 'OK' });
+  //     router.post(
+  //       "/logout",
+  //       (req, res, next) => {
+  //         res.clearCookie("jwt");
+  //         next();
+  //       },
+  //       (req, res) => {
+  //         console.log(req.cookies);
+  //         res.end("finish");
+  //       }
+  //     );
+};
 
 // # возвращает информацию о пользователе (email и имя)
 // GET /users/me
@@ -127,10 +111,14 @@ module.exports.getUser = async (req, res, next) => {
 
 // # обновляет информацию о пользователе (email и имя)
 // PATCH /users/me
+
+// При обновлении данных пользователя с использованием почтового ящика,
+// который принадлежит другому юзеру, необходимо возвращать ошибку 409.
 module.exports.patchUser = async (req, res, next) => {
+  const { email } = req.body;
   try {
     const user = await User.findOneAndUpdate(
-      // req.user._id,
+      req.user._id,
       {
         name: req.body.name,
         email: req.body.email,
@@ -140,7 +128,11 @@ module.exports.patchUser = async (req, res, next) => {
       //   runValidators: true,
       // },
     );
-    if (user) {
+
+    const userEmail = await User.findOne({ email });
+    if (userEmail) {
+      next(new Conflict(`Пользователей с таким ${email} уже есть`)); // User already exists for that email: ${email}
+    } if (user) {
       res.send(user);
     } else {
       next(new NotFound('Пользователь по указанному _id не найден'));
