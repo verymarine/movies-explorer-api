@@ -70,7 +70,7 @@ module.exports.deleteFavoriteMovie = async (req, res, next) => {
     if (movie.owner.toString() !== req.user._id) {
       return next(new Forbidden('Этот фильм удалить нельзя'));
     }
-    return movie.remove().then(() => res.send({ message: 'Фильм успешно удален' })); // write message about succesful delete?
+    return movie.remove().then(() => res.send({ message: 'Фильм успешно удален' })).catch((err) => err); // write message about succesful delete?
   } catch (err) {
     next(err);
   }
