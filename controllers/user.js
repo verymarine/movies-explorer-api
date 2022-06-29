@@ -30,7 +30,6 @@ module.exports.login = async (req, res, next) => {
           res.cookie('token', token, {
             maxAge: 3600000,
             httpOnly: true,
-            secure: true,
             sameSite: false,
           });
 
@@ -59,7 +58,7 @@ module.exports.createUser = async (req, res, next) => {
     const savedUser = await user.save();
     const { password: removedPassword, ...result } = savedUser.toObject();
 
-    res.status(201).BadRequestsend(result);
+    res.status(201).send(result);
   } catch (err) {
     if (err.code === MONGO_DUBLICATE_ERROR_CODE) {
       return next(new Conflict('Пользователь уже существует'));

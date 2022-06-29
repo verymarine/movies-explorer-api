@@ -69,7 +69,7 @@ module.exports.deleteFavoriteMovie = async (req, res, next) => {
       return next(new Forbidden('Этот фильм удалить нельзя'));
     }
     if (movie) {
-      res.send.remove(movie);
+      res.send(movie);
     } else {
       next(new NotFound('Фильм с таким _id не найден'));
     }
@@ -77,6 +77,25 @@ module.exports.deleteFavoriteMovie = async (req, res, next) => {
     next(err);
   }
 };
+
+// module.exports.deleteFavoriteMovie = async (req, res, next) => {
+//   try {
+//     await Movie.findByIdAndDelete(req.params._id)
+//       .then((movie) => {
+//         if (movie.owner.toString() !== req.user._id) {
+//           return next(new Forbidden('Этот фильм удалить нельзя'));
+//         }
+//         if (movie) {
+//           res.send(movie);
+//         }
+//       })
+//       .catch((err) => {
+//         next(new NotFound('Фильм с таким _id не найден'));
+//       });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
 
 // {
 
