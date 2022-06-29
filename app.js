@@ -14,8 +14,6 @@ const NotFound = require('./errors/NotFound');
 
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-
-
 const { NODE_ENV, DB_CONN } = process.env;
 
 const allowedCors = [
@@ -64,7 +62,6 @@ app.use(limiter);
 
 // регистраци и логин
 app.use(require('./routes/auth'));
-
 
 app.use(auth);
 
