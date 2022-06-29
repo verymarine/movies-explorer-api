@@ -1,4 +1,5 @@
 require('dotenv').config();
+const { celebrate, Joi, errors } = require('celebrate');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -12,6 +13,8 @@ const limiter = require('./middlewares/limiter');
 const NotFound = require('./errors/NotFound');
 
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+
+
 
 const { NODE_ENV, DB_CONN } = process.env;
 
