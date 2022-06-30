@@ -37,7 +37,7 @@ module.exports.login = async (req, res, next) => {
         }
       })
       .catch((err) => {
-        next(new Unauthorized(err));
+        next((err));
       });
   } catch (err) {
     return next(new Unauthorized('Неправильная почта или пароль'));
@@ -137,7 +137,7 @@ module.exports.patchUser = async (req, res, next) => {
       next(new BadRequest('Переданы некорректные данные при изменении пользователя'));
     }
     if (err.code === MONGO_DUBLICATE_ERROR_CODE) {
-      next(new Conflict('Пользователь уже существует'));
+      next(new Conflict('Пользователь с таким email уже существует'));
     }
     next(err);
   }
