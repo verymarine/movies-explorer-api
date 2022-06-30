@@ -65,14 +65,15 @@ module.exports.deleteFavoriteMovie = async (req, res, next) => {
   try {
     const { _id } = req.params;
     // const movie = await Movie.findByIdAndDelete(req.params._id);
-    const movie = await Movie.findOne({ _id }); // needs owner???
+    const movie = await Movie.findOne({ _id }).orFail(() => new NotFound('Фильм с таким _id не найден'));// needs owner???
     // .populate('owner'); // findbyone difference betwee
     if (movie.owner.toString() !== req.user._id) {
-      return next(new Forbidden('Этот фильм удалить нельзя'));
+      return next(new Forbidden('Этот фильм удалить нельзя, он чужой'));
     }
     return movie.remove().then(() => res.send({ message: 'Фильм успешно удален' })).catch((err) => err); // write message about succesful delete?
   } catch (err) {
     next(err);
+    return null;
   }
 };
 

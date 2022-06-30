@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { celebrate, Joi, errors } = require('celebrate');
+const { errors } = require('celebrate');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -42,7 +42,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // для приёма ве�
 app.use(cookieParser());
 
 // подключаемся к серверу mongo
-mongoose.connect(NODE_ENV === 'production' ? DB_CONN : '', {
+mongoose.connect(NODE_ENV === 'production' ? DB_CONN : 'mongodb://localhost:27017/moviesdb', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
