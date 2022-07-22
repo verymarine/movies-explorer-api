@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { celebrate, Joi, errors } = require('celebrate');
+const { errors } = require('celebrate');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
