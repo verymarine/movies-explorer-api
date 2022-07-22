@@ -30,7 +30,6 @@ module.exports.login = async (req, res, next) => {
           res.cookie('token', token, {
             maxAge: 3600000,
             httpOnly: true,
-            secure: true,
             sameSite: false,
           });
 
@@ -38,10 +37,10 @@ module.exports.login = async (req, res, next) => {
         }
       })
       .catch((err) => {
-        next(new Unauthorized(err, 'Неправильная почта или пароль'));
+        next((err));
       });
   } catch (err) {
-    return next(new NotFound('Неправильная почта или пароль'));
+    return next(new Unauthorized('Неправильная почта или пароль'));
   }
   return null;
 };
@@ -58,6 +57,7 @@ module.exports.createUser = async (req, res, next) => {
     });
     const savedUser = await user.save();
     const { password: removedPassword, ...result } = savedUser.toObject();
+
     res.status(201).send(result);
   } catch (err) {
     if (err.code === MONGO_DUBLICATE_ERROR_CODE) {
@@ -114,7 +114,7 @@ module.exports.getUser = async (req, res, next) => {
 // При обновлении данных пользователя с использованием почтового ящика,
 // который принадлежит другому юзеру, необходимо возвращать ошибку 409.
 module.exports.patchUser = async (req, res, next) => {
-  const { email } = req.body;
+  // const { email } = req.body;
   try {
     const user = await User.findOneAndUpdate(
       req.user._id,
@@ -127,11 +127,7 @@ module.exports.patchUser = async (req, res, next) => {
       //   runValidators: true,
       // },
     );
-
-    const userEmail = await User.findOne({ email });
-    if (userEmail) {
-      next(new Conflict(`Пользователей с таким ${email} уже есть`)); // User already exists for that email: ${email}
-    } if (user) {
+    if (user) {
       res.send(user);
     } else {
       next(new NotFound('Пользователь по указанному _id не найден'));
@@ -139,6 +135,9 @@ module.exports.patchUser = async (req, res, next) => {
   } catch (err) {
     if (err.name === 'ValidationError') {
       next(new BadRequest('Переданы некорректные данные при изменении пользователя'));
+    }
+    if (err.code === MONGO_DUBLICATE_ERROR_CODE) {
+      next(new Conflict('Пользователь с таким email уже существует'));
     }
     next(err);
   }
