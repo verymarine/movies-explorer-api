@@ -63,21 +63,39 @@ module.exports.postFavoriteMovie = async (req, res, next) => {
 // DELETE /movies/_id
 module.exports.deleteFavoriteMovie = async (req, res, next) => {
   try {
-    const movie = await Movie.findByIdAndDelete(req.params._id);
+    const { _id } = req.params;
+    // const movie = await Movie.findByIdAndDelete(req.params._id);
+    const movie = await Movie.findOne({ _id }).orFail(() => new NotFound('Фильм с таким _id не найден'));// needs owner???
     // .populate('owner'); // findbyone difference betwee
     if (movie.owner.toString() !== req.user._id) {
-      return next(new Forbidden('Этот фильм удалить нельзя'));
+      return next(new Forbidden('Этот фильм удалить нельзя, он чужой'));
     }
-    if (movie) {
-      res.send.remove(movie);
-    } else {
-      next(new NotFound('Фильм с таким _id не найден'));
-    }
+    return movie.remove().then(() => res.send({ message: 'Фильм успешно удален' })).catch((err) => err); // write message about succesful delete?
   } catch (err) {
     next(err);
+    return null;
   }
   return null;
 };
+
+// module.exports.deleteFavoriteMovie = async (req, res, next) => {
+//   try {
+//     await Movie.findByIdAndDelete(req.params._id)
+//       .then((movie) => {
+//         if (movie.owner.toString() !== req.user._id) {
+//           return next(new Forbidden('Этот фильм удалить нельзя'));
+//         }
+//         if (movie) {
+//           res.send(movie);
+//         }
+//       })
+//       .catch((err) => {
+//         next(new NotFound('Фильм с таким _id не найден'));
+//       });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
 
 // {
 
