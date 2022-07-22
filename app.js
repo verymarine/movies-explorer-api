@@ -19,6 +19,8 @@ const { NODE_ENV, DB_CONN } = process.env;
 const allowedCors = [
   'https://api.moviehub.nomoredomains.xyz',
   'http://api.moviehub.nomoredomains.xyz',
+  'https://moviehub.nomoredomains.xyz',
+  'http://moviehub.nomoredomains.xyz',
   'https://api.nomoreparties.co/beatfilm-movies',
   'http://api.nomoreparties.co/beatfilm-movies',
   'https://localhost:3001',
