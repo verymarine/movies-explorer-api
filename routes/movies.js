@@ -10,19 +10,23 @@ router.post('/movies', celebrate({
     duration: Joi.number().required(),
     year: Joi.string().required(),
     description: Joi.string().required(),
-    image: Joi.string().required().pattern(/https?:\/\/(www\.)?[-\w@:%\\.\\+~#=]{1,256}\.[a-z0-9()]{1,6}\b([-\w()@:%\\.\\+~#=//?&]*)/i), // image — ссылка на постер к фильму. Обязательное поле-строка.
+    image: Joi.string().required(),
+    // (/https?:\/\/(www\.)?[-\w@:%\\.\\+~#=]{1,256}\.[a-z0-9()]{1,6}\b([-\w()@:%\\.\\+~#=//?&]*)/i)
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
-    thumbnail: Joi.string().required().pattern(/https?:\/\/(www\.)?[-\w@:%\\.\\+~#=]{1,256}\.[a-z0-9()]{1,6}\b([-\w()@:%\\.\\+~#=//?&]*)/i), // thumbnail — миниатюрное изображение постера к фильму.
+    thumbnail: Joi.string().required(),
+    // (/https?:\/\/(www\.)?[-\w@:%\\.\\+~#=]{1,256}\.[a-z0-9()]{1,6}\b([-\w()@:%\\.\\+~#=//?&]*)/i)
     movieId: Joi.number().required(),
-    trailerLink: Joi.string().required().pattern(/https?:\/\/(www\.)?[-\w@:%\\.\\+~#=]{1,256}\.[a-z0-9()]{1,6}\b([-\w()@:%\\.\\+~#=//?&]*)/i), // trailerLink — ссылка на трейлер фильма.
+    trailerLink: Joi.string().required(),
+    // (/https?:\/\/(www\.)?[-\w@:%\\.\\+~#=]{1,256}\.[a-z0-9()]{1,6}\b([-\w()@:%\\.\\+~#=//?&]*)/i)
   }),
 }), postFavoriteMovie);
 
 router.delete('/movies/:_id', celebrate({
   params: Joi.object().keys({
-    _id: Joi.string().length(24).hex().required(), // number??
+    _id: Joi.string().length(24).hex(),
   }),
 }), deleteFavoriteMovie);
+// router.delete('/movies/:movieId', deleteFavoriteMovie);
 
 module.exports = router;
