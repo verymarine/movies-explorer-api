@@ -96,6 +96,7 @@ module.exports.getUser = async (req, res, next) => {
     const user = await User.findOne(req.user);
     if (user) {
       res.send(user);
+      console.log(user, 'user')
     } else {
       next(new NotFound('Пользователь по указанному _id не найден'));
     }
