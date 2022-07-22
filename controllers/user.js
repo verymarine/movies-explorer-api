@@ -72,6 +72,47 @@ module.exports.createUser = async (req, res, next) => {
   return null;
 };
 
+
+
+
+
+
+// module.exports.createUser = async (req, res, next) => {
+//   try {
+//     const {
+//       name, email, password,
+//     } = req.body;
+//     bcrypt.hash(password, 10)
+//       .then((hash) => {
+//         User.create({
+//           name, email, password: hash,
+//         });
+//       }).then((result) => {
+//         res.status(201).send(result);
+//       }).catch((err) => console.log(err));
+//   } catch (err) {
+//     if (err.code === MONGO_DUBLICATE_ERROR_CODE) {
+//       return next(new Conflict('Пользователь уже существует'));
+//     }
+//     if (err.name === 'ValidationError') {
+//       next(new BadRequest('Переданы некорректные данные при создании пользователя'));
+//     } else {
+//       next(err);
+//     }
+//   }
+//   return null;
+// };
+
+
+
+
+
+
+
+
+
+
+
 // ВЫХОД
 module.exports.logout = async (req, res) => {
   res.clearCookie('token');
@@ -123,10 +164,10 @@ module.exports.patchUser = async (req, res, next) => {
         name: req.body.name,
         email: req.body.email,
       },
-      // {
-      //   new: true,
-      //   runValidators: true,
-      // },
+      {
+        new: true,
+        runValidators: true,
+      },
     );
     if (user) {
       res.send(user);
