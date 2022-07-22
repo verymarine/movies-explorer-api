@@ -34,7 +34,7 @@ module.exports.login = async (req, res, next) => {
             sameSite: false,
           });
 
-          return res.send({ jwt: token });
+          res.send({ jwt: token });
         }
       })
       .catch((err) => {
@@ -58,8 +58,7 @@ module.exports.createUser = async (req, res, next) => {
     });
     const savedUser = await user.save();
     const { password: removedPassword, ...result } = savedUser.toObject();
-
-    res.status(201).BadRequestsend(result);
+    res.status(201).send(result);
   } catch (err) {
     if (err.code === MONGO_DUBLICATE_ERROR_CODE) {
       return next(new Conflict('Пользователь уже существует'));

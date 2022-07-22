@@ -76,6 +76,7 @@ module.exports.deleteFavoriteMovie = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+  return null;
 };
 
 // {
