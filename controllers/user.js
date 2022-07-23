@@ -27,11 +27,12 @@ module.exports.login = async (req, res, next) => {
         if (matched) {
           const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
 
-          res.cookie('token', token, {
-            maxAge: 3600000,
-            // httpOnly: true,
-            // sameSite: false,
-          });
+          // res.cookie('token', token, {
+          //   maxAge: 3600000,
+          //   // httpOnly: true,
+          //   // sameSite: false,
+          // });
+          res.localStorage.setItem('jwt', token);
 
           res.send({ jwt: token });
         }
