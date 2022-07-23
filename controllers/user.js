@@ -27,16 +27,16 @@ module.exports.login = async (req, res, next) => {
         if (matched) {
           const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
 
-          // res.cookie('token', token, {
-          //   maxAge: 3600000,
-          //   httpOnly: true,
-          //   sameSite: false,
-          //   secure: true,
-          // });
+          res.cookie('token', token, {
+            maxAge: 3600000,
+            httpOnly: true,
+            sameSite: 'None',
+            secure: true,
+          });
           console.log(res, 'res');
           console.log(token, 'token user.js');
 
-          res.send({ token });
+          res.send({ jwt: token });
         }
       })
       .catch((err) => {
