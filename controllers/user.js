@@ -74,7 +74,7 @@ module.exports.createUser = async (req, res, next) => {
     res.status(201).send(result);
   } catch (err) {
     if (err.code === MONGO_DUBLICATE_ERROR_CODE) {
-      return next(new Conflict('Пользователь уже существует'));
+      next(new Conflict('Пользователь уже существует'));
     }
     if (err.name === 'ValidationError') {
       next(new BadRequest('Переданы некорректные данные при создании пользователя'));
@@ -84,6 +84,35 @@ module.exports.createUser = async (req, res, next) => {
   }
   return null;
 };
+
+
+
+
+
+// module.exports.createUser = (req, res, next) => {
+//   const {
+//     name, email, password,
+//   } = req.body;
+
+//   bcrypt.hash(password, 10)
+//     .then((hash) => {
+//       User.create({
+//         name, email, password: hash,
+//       });
+//       res.status(201).send(User);
+//     })
+
+//     .catch((err) => {
+//       if (err.code === MONGO_DUBLICATE_ERROR_CODE) {
+//         next(new Conflict('Пользователь уже существует'));
+//       }
+//       if (err.name === 'ValidationError') {
+//         next(new BadRequest('Переданы некорректные данные при создании пользователя'));
+//       } else {
+//         next(err);
+//       }
+//     })
+// };
 
 
 
@@ -171,7 +200,7 @@ module.exports.getUser = async (req, res, next) => {
 module.exports.patchUser = async (req, res, next) => {
   // const { email } = req.body;
   try {
-    const user = await User.findOneAndUpdate(
+    const user = await User.findByIdAndUpdate(
       req.user._id,
       {
         name: req.body.name,
