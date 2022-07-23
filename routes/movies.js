@@ -18,7 +18,7 @@ router.post('/movies', celebrate({
     // (/https?:\/\/(www\.)?[-\w@:%\\.\\+~#=]{1,256}\.[a-z0-9()]{1,6}\b([-\w()@:%\\.\\+~#=//?&]*)/i)
     movieId: Joi.number().required(),
     trailerLink: Joi.string().required(),
-    _id: Joi.string().length(24).hex(),
+    // _id: Joi.string().length(24).hex(),
     // (/https?:\/\/(www\.)?[-\w@:%\\.\\+~#=]{1,256}\.[a-z0-9()]{1,6}\b([-\w()@:%\\.\\+~#=//?&]*)/i)
   }),
 }), postFavoriteMovie);
