@@ -34,6 +34,7 @@ module.exports.login = async (req, res, next) => {
             secure: true,
           });
           console.log(res, 'res');
+          console.log(token, 'token user.js');
 
           res.send({ jwt: token });
         }
