@@ -30,7 +30,7 @@ module.exports.login = async (req, res, next) => {
           res.cookie('token', token, {
             maxAge: 3600000,
             httpOnly: true,
-            sameSite: true,
+            sameSite: false,
             secure: true,
           });
 
