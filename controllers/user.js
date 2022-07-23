@@ -36,7 +36,7 @@ module.exports.login = async (req, res, next) => {
           console.log(res, 'res');
           console.log(token, 'token user.js');
 
-          res.send({ jwt: token });
+          res.send({ token });
         }
       })
       .catch((err) => {
