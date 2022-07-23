@@ -17,8 +17,8 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { NODE_ENV, DB_CONN } = process.env;
 
 const allowedCors = [
-  // 'https://api.moviehub.nomoredomains.xyz',
-  // 'http://api.moviehub.nomoredomains.xyz',
+  'https://api.moviehub.nomoredomains.xyz',
+  'http://api.moviehub.nomoredomains.xyz',
   'https://moviehub.nomoredomains.xyz',
   'http://moviehub.nomoredomains.xyz',
   'https://api.nomoreparties.co/beatfilm-movies',
