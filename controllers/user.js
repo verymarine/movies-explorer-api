@@ -21,21 +21,16 @@ module.exports.login = async (req, res, next) => {
     const user = await User.findOne({ email }).select('+password');
     bcrypt.compare(password, user.password)
       .then((matched) => {
-        // if (!matched) {
-        //   return next(new Unauthorized('Не удалось авторизоваться'));
-        // }
         if (matched) {
           const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
 
-          res.cookie('token', token, {
-            maxAge: 3600000,
-            httpOnly: true,
-            sameSite: 'None',
-            secure: true,
-          });
+          // res.cookie('token', token, {
+          //   maxAge: 3600000,
+          //   httpOnly: true,
+          //   sameSite: 'None',
+          //   secure: true,
+          // });
           console.log(res, 'res');
-          console.log(token, 'token user.js');
-
           res.send({ jwt: token });
         }
       })
@@ -47,16 +42,6 @@ module.exports.login = async (req, res, next) => {
   }
   return null;
 };
-
-
-
-
-
-
-
-
-
-
 
 // REGISTRATION
 module.exports.createUser = async (req, res, next) => {
@@ -85,10 +70,6 @@ module.exports.createUser = async (req, res, next) => {
   return null;
 };
 
-
-
-
-
 // module.exports.createUser = (req, res, next) => {
 //   const {
 //     name, email, password,
@@ -113,11 +94,6 @@ module.exports.createUser = async (req, res, next) => {
 //       }
 //     })
 // };
-
-
-
-
-
 
 // module.exports.createUser = async (req, res, next) => {
 //   try {
@@ -145,16 +121,6 @@ module.exports.createUser = async (req, res, next) => {
 //   return null;
 // };
 
-
-
-
-
-
-
-
-
-
-
 // ВЫХОД
 module.exports.logout = async (req, res) => {
   res.clearCookie('token');
@@ -172,6 +138,32 @@ module.exports.logout = async (req, res) => {
   //     );
 };
 
+// module.exports.createUser = async (req, res, next) => {
+//   try {
+//     const {
+//       name, email, password,
+//     } = req.body;
+//     const hash = await bcrypt.hash(password, 10);
+//     const user = await User.create({
+//       name, email, password: hash,
+//     });
+//     const savedUser = await user.save();
+//     const { password: removedPassword, ...result } = savedUser.toObject();
+
+//     res.status(201).send(result);
+//   } catch (err) {
+//     if (err.code === MONGO_DUBLICATE_ERROR_CODE) {
+//       next(new Conflict('Пользователь уже существует'));
+//     }
+//     if (err.name === 'ValidationError') {
+//       next(new BadRequest('Переданы некорректные данные при создании пользователя'));
+//     } else {
+//       next(err);
+//     }
+//   }
+//   return null;
+// };
+
 // # возвращает информацию о пользователе (email и имя)
 // GET /users/me
 module.exports.getUser = async (req, res, next) => {
@@ -179,7 +171,7 @@ module.exports.getUser = async (req, res, next) => {
     const user = await User.findOne(req.user);
     if (user) {
       res.send(user);
-      console.log(user, 'user')
+      console.log(user, 'user');
     } else {
       next(new NotFound('Пользователь по указанному _id не найден'));
     }

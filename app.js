@@ -84,7 +84,7 @@ app.use(errorLogger);
 
 app.use(errors());
 
-// app.use(error);
+app.use(error);
 
 app.listen(PORT, () => {
   console.log(`server listen port ${PORT}`);

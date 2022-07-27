@@ -7,7 +7,7 @@ const Forbidden = require('../errors/Forbidden');
 // GET /movies
 module.exports.getFavoriteMovies = async (req, res, next) => {
   try {
-    const movies = await Movie.find({}).populate('owner');
+    const movies = await Movie.find({ owner: req.user._id }).populate('owner');
     if (movies) {
       res.send(movies);
     }
@@ -63,9 +63,9 @@ module.exports.postFavoriteMovie = async (req, res, next) => {
 // DELETE /movies/_id
 module.exports.deleteFavoriteMovie = async (req, res, next) => {
   try {
-    const { _id } = req.params;
+    const { id } = req.params;
     // const movie = await Movie.findByIdAndDelete(req.params._id);
-    const movie = await Movie.findOne({ _id }).orFail(() => new NotFound('Фильм с таким _id не найден'));// needs owner???
+    const movie = await Movie.findOne({ movieId: id, owner: req.user._id }).orFail(() => new NotFound('Фильм с таким _id не найден'));// needs owner???
     // .populate('owner'); // findbyone difference betwee
     if (movie.owner.toString() !== req.user._id) {
       return next(new Forbidden('Этот фильм удалить нельзя, он чужой'));

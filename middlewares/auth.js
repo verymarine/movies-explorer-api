@@ -5,8 +5,9 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports = (req, res, next) => {
   // const { token } = req.cookies;
-  // const token = req.headers.authorization;
-  const token = req.cookies.token || req.headers.authorization;
+  // const token = req.headers;
+  // const token = req.headers.cookies;
+  const token = req.headers.authorization || req.headers;
   console.log(token, 'token auth');
   // console.log(req.cookies.token, 'req.cookies.token');
   if (!token) {
@@ -18,8 +19,6 @@ module.exports = (req, res, next) => {
   // верифицируем токен
   try {
     payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
-    console.log(payload, 'payload');
-    console.log(jwt, 'jwt auth');
   } catch (err) {
     next(new Unauthorized('Необходима авторизация'));
   }

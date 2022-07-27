@@ -23,9 +23,9 @@ router.post('/movies', celebrate({
   }),
 }), postFavoriteMovie);
 
-router.delete('/movies/:_id', celebrate({
+router.delete('/movies/:id', celebrate({
   params: Joi.object().keys({
-    _id: Joi.string().length(24).hex(),
+    id: Joi.number(),
   }),
 }), deleteFavoriteMovie);
 // router.delete('/movies/:movieId', deleteFavoriteMovie);
