@@ -95,18 +95,3 @@ module.exports.deleteFavoriteMovie = async (req, res, next) => {
 //     next(err);
 //   }
 // };
-
-// {
-
-//   "country": "TEST",
-//         "director": "TEST",
-//         "duration":"10",
-//         "year": "TEST",
-//         "description": "TEST",
-//         "image": "https://stickers.wiki/static/stickers/nekostickerpack407/file_674866.webp",
-//         "nameRU": "TEST",
-//         "nameEN": "TEST",
-//         "thumbnail": "https://stickers.wiki/static/stickers/nekostickerpack407/file_674866.webp",
-//         "movieId": "12",
-//        "trailerLink": "https://stickers.wiki/static/stickers/nekostickerpack407/file_674866.webp"
-//   }
